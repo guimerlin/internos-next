@@ -1,4 +1,3 @@
-import React, { use } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { auth } from '@/auth';
@@ -11,27 +10,16 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { Holerite } from '@/types';
+import { Holerite, User } from '@/types';
 import Image from 'next/image';
-import {
-  Item,
-  ItemContent,
-  ItemTitle,
-  ItemDescription,
-  ItemHeader,
-  ItemActions,
-} from '@/components/ui/item';
 import { view } from './actions';
 import { Button } from '@/components/ui/button';
 
-async function fetchUserData(userId: string): Promise<{
-  uid: string;
-  holerites: Holerite[];
-}> {
+async function fetchUserData(userId: string): Promise<User> {
   try {
     const holeritesQuery = query(
       collection(db, 'holerites'),
-      where('uid', '==', userId),
+      where('targetUid', '==', userId),
     );
     const userDocQuery = query(
       collection(db, 'users'),
@@ -45,16 +33,21 @@ async function fetchUserData(userId: string): Promise<{
 
     const holerites = holeritesSnap.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
-    }));
+      ...(doc.data() as Omit<Holerite, 'id'>),
+    })) as Holerite[];
+
     const userData =
       userSnap.docs.length > 0
-        ? { uid: userSnap.docs[0].id, ...userSnap.docs[0].data() }
+        ? {
+            uid: userSnap.docs[0].id,
+            ...(userSnap.docs[0].data() as any),
+          }
         : { uid: userId };
+
     return {
       ...userData,
       holerites,
-    };
+    } as User;
   } catch (e) {
     console.error('Erro ao buscar dados do usuário:', e);
     throw e;
