@@ -12,6 +12,7 @@ import { User } from 'lucide-react';
 import Image from 'next/image';
 import { auth } from '@/auth';
 import Link from 'next/link';
+import { logout } from '@/app/(auth)/conta/actions';
 
 export async function ProfileDropdown() {
   const session = await auth();
@@ -44,18 +45,28 @@ export async function ProfileDropdown() {
           <Link href="/conta">
             <DropdownMenuItem>Perfil</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>Pagamentos</DropdownMenuItem>
-          <DropdownMenuItem>Configurações</DropdownMenuItem>
+          <Link href="/conta/pagamentos">
+            <DropdownMenuItem disabled>Pagamentos</DropdownMenuItem>
+          </Link>
+          <Link href="/conta/holerites">
+            <DropdownMenuItem>Holerites</DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Avisos</DropdownMenuItem>
+          <DropdownMenuItem disabled>Avisos</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Suporte</DropdownMenuItem>
+        <DropdownMenuItem disabled>Suporte</DropdownMenuItem>
         <DropdownMenuItem disabled>Cursos</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Sair</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <form action={logout}>
+            <Button type="submit" variant="destructive">
+              Sair
+            </Button>
+          </form>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
