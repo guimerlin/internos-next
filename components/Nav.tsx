@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Logotipo from './Logotipo';
-import { User } from 'lucide-react';
 import { auth } from '@/auth';
+import { ProfileDropdown } from './ProfileDropdown';
 
 export default async function Nav() {
   const session = await auth();
@@ -34,9 +34,7 @@ export default async function Nav() {
               Login
             </Link>
           ) : (
-            <Link href="/conta" className="">
-              <User size={19} />
-            </Link>
+            <ProfileDropdown />
           )}
         </div>
       </nav>

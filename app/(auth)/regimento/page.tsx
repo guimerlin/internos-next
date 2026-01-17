@@ -523,7 +523,7 @@ const RegimentoInterno = async () => {
         </section>
 
         {/* Footer / Assinatura */}
-        <footer className="mx-auto mt-24 max-w-4xl border-t border-zinc-100 pt-12 pb-20">
+        {/* <footer className="mx-auto mt-24 max-w-4xl border-t border-zinc-100 pt-12 pb-20">
           <div className="rounded-sm bg-zinc-900 p-10 text-white shadow-xl">
             <div className="mb-6 flex items-center gap-3">
               <FileText className="text-red-500" size={24} />
@@ -554,7 +554,7 @@ const RegimentoInterno = async () => {
           <p className="mt-12 text-center text-xs tracking-[0.2em] text-zinc-400 uppercase">
             Drogaria Cesária © 2026 • Todos os direitos reservados
           </p>
-        </footer>
+        </footer> */}
       </main>
     </div>
   );
