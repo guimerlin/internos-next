@@ -19,7 +19,7 @@ async function fetchUserData(userId: string): Promise<User> {
   try {
     const holeritesQuery = query(
       collection(db, 'holerites'),
-      where('targetUid', '==', userId),
+      where('uid', '==', userId),
     );
     const userDocQuery = query(
       collection(db, 'users'),
