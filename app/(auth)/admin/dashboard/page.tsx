@@ -102,7 +102,7 @@ const page = async () => {
                     {colaborador.image ? (
                       <Image
                         src={colaborador.image}
-                        alt={colaborador.name}
+                        alt={colaborador.name as string}
                         fill
                         className="object-cover"
                       />
@@ -124,8 +124,8 @@ const page = async () => {
 
                 {/* BOTÃO DIALOG DE UPLOAD AQUI */}
                 <HoleriteUploadDialog
-                  userId={colaborador.uid}
-                  userName={colaborador.name}
+                  userId={colaborador.uid as string}
+                  userName={colaborador.name as string}
                 />
               </CardHeader>
 
@@ -135,7 +135,7 @@ const page = async () => {
                     Holerites Recentes
                   </p>
 
-                  <ScrollArea className="h-[120px] rounded-md border bg-gray-50 p-2">
+                  <ScrollArea className="h-30 rounded-md border bg-gray-50 p-2">
                     {colaborador.holerites &&
                     colaborador.holerites.length > 0 ? (
                       <ul className="space-y-2">
@@ -146,7 +146,7 @@ const page = async () => {
                           >
                             <div className="flex items-center gap-2">
                               <Paperclip className="h-3 w-3 text-red-500" />
-                              <span className="max-w-[120px] truncate font-medium text-gray-700">
+                              <span className="max-w-30 truncate font-medium text-gray-700">
                                 {holerite.natureza}
                               </span>
                             </div>

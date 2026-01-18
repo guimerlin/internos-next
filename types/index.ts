@@ -13,6 +13,7 @@ export interface Holerite {
 export interface User {
   uid?: string;
   nome?: string;
+  name?: string;
   image?: string;
   email?: string;
   role?: string;
