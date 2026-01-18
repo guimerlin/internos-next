@@ -8,9 +8,12 @@ import { Holerite, User } from '@/types';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { Calendar, Paperclip } from 'lucide-react';
 import { HoleriteUploadDialog } from './HoleriteUpload';
+import { Button } from '@/components/ui/button';
+import { Trash } from 'lucide-react';
+import { exclude } from './action';
+import Link from 'next/link';
 
 async function fetchAllUsersWithData(): Promise<User[]> {
   try {
@@ -55,7 +58,6 @@ const page = async () => {
   const user = session?.user;
 
   const users = await fetchAllUsersWithData();
-  console.log(users);
 
   if (!user) return redirect('/login');
 
@@ -86,14 +88,14 @@ const page = async () => {
       {/* --- GRID DE USUÁRIOS --- */}
       <div className="container mx-auto mt-12 px-4">
         <h2 className="mb-6 text-2xl font-bold tracking-tight">
-          Colaboradores
+          Informações de Pagamentos
         </h2>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {users.map((colaborador) => (
             <Card
               key={colaborador.uid}
-              className="overflow-hidden border-t-4 border-t-red-600 shadow-sm transition-shadow hover:shadow-md"
+              className="overflow-hidden shadow-sm transition-shadow hover:shadow-md"
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-white pb-2">
                 <div className="flex items-center gap-3">
@@ -132,7 +134,7 @@ const page = async () => {
               <CardContent>
                 <div className="mt-4">
                   <p className="mb-2 text-xs font-semibold text-gray-500 uppercase">
-                    Holerites Recentes
+                    Holerites Enviados
                   </p>
 
                   <ScrollArea className="h-30 rounded-md border bg-gray-50 p-2">
@@ -140,8 +142,9 @@ const page = async () => {
                     colaborador.holerites.length > 0 ? (
                       <ul className="space-y-2">
                         {colaborador.holerites.map((holerite) => (
-                          <li
+                          <Link
                             key={holerite.id}
+                            href={holerite.imagem as string}
                             className="flex items-center justify-between rounded bg-white p-2 text-sm shadow-sm"
                           >
                             <div className="flex items-center gap-2">
@@ -156,8 +159,21 @@ const page = async () => {
                               <span>
                                 {new Date(holerite.data).toLocaleDateString()}
                               </span>
+                              <form action={exclude}>
+                                <input
+                                  type="hidden"
+                                  value={holerite.id}
+                                  name="id"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  className="text-red-500"
+                                >
+                                  <Trash />
+                                </Button>
+                              </form>
                             </div>
-                          </li>
+                          </Link>
                         ))}
                       </ul>
                     ) : (
@@ -167,14 +183,8 @@ const page = async () => {
                     )}
                   </ScrollArea>
 
-                  <div className="text-muted-foreground mt-4 flex items-center justify-between text-xs">
+                  <div className="text-muted-foreground mt-4 flex items-start justify-between text-xs">
                     <span>Total: {colaborador.holerites?.length || 0}</span>
-                    <Badge
-                      variant="outline"
-                      className="border-red-200 bg-red-50 text-red-700"
-                    >
-                      Ativo
-                    </Badge>
                   </div>
                 </div>
               </CardContent>

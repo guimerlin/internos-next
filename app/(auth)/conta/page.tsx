@@ -84,12 +84,12 @@ const page = async ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {!user.admin && (
+            {user.admin && (
               <Item variant="outline">
                 <ItemContent>
                   <ItemTitle>Admin</ItemTitle>
                   <ItemDescription>
-                    Faça Uploads e Atualizações em informações.
+                    Faça Uploads e Atualizações de informações.
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions>

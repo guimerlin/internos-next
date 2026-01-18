@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/firebase/config';
 import { uploadImage } from '@/lib/imageKit';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 export async function uploadHolerite(formData: FormData) {
@@ -32,5 +32,16 @@ export async function uploadHolerite(formData: FormData) {
   } catch (error) {
     console.error('Erro no upload:', error);
     return { success: false, error: 'Falha ao processar upload' };
+  }
+}
+
+export async function exclude(formData: FormData) {
+  const id = formData.get('id') as string;
+  try {
+    await deleteDoc(doc(db, 'holerites', id));
+    revalidatePath('/admin/dashboard');
+  } catch (e) {
+    console.error('Erro ao remover holerite:', e);
+    throw e;
   }
 }
