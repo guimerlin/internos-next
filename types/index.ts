@@ -11,10 +11,10 @@ export interface Holerite {
 }
 
 export interface User {
-  uid: string;
+  uid?: string;
   nome?: string;
   image?: string;
   email?: string;
   role?: string;
-  holerites: Holerite[];
+  holerites?: Holerite[];
 }

@@ -19,10 +19,20 @@ import {
   ItemDescription,
   ItemTitle,
 } from '@/components/ui/item';
+import UserInfo from './UserInfo';
+import EditInfo from './EditInfo';
+import { redirect } from 'next/navigation';
 
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ action: string }>;
+}) => {
   const session = await auth();
   const user = session?.user;
+  const SearchParams = await searchParams;
+
+  if (!user) return redirect('/login');
 
   return (
     <div className="mx-8 my-20 flex flex-col items-center justify-center">
@@ -47,36 +57,12 @@ const page = async () => {
         </div>
       </div>
       <div className="mt-10 flex w-full flex-col items-center justify-center gap-2 md:flex-row md:items-start md:justify-center">
-        <Card>
-          <CardHeader>
-            <CardTitle>Suas Informações</CardTitle>
-            <CardDescription>
-              Verifique ou atualize suas informações pessoais.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Item variant="default">
-              <ItemContent>
-                <ItemTitle>Nome:</ItemTitle>
-                <ItemDescription>{user?.name}</ItemDescription>
-              </ItemContent>
-            </Item>
-            <Item variant="default">
-              <ItemContent>
-                <ItemTitle>Email:</ItemTitle>
-                <ItemDescription>{user?.email}</ItemDescription>
-              </ItemContent>
-            </Item>
-          </CardContent>
-          <CardFooter className="justify-center">
-            <Link
-              href="/conta/editar"
-              className={buttonVariants({ variant: 'default' })}
-            >
-              Editar Informações
-            </Link>
-          </CardFooter>
-        </Card>
+        {SearchParams.action !== 'edit' ? (
+          <UserInfo user={user} />
+        ) : (
+          <EditInfo user={user} />
+        )}
+
         <Card className="w-auto">
           <CardHeader>
             <CardTitle>Opções Úteis</CardTitle>
@@ -85,6 +71,24 @@ const page = async () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
+            {!user.admin && (
+              <Item variant="outline">
+                <ItemContent>
+                  <ItemTitle>Admin</ItemTitle>
+                  <ItemDescription>
+                    Faça Uploads e Atualizações em informações.
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <Link
+                    href="/admin/dashboard"
+                    className={buttonVariants({ variant: 'outline' })}
+                  >
+                    Abrir
+                  </Link>
+                </ItemActions>
+              </Item>
+            )}
             <Item variant="outline">
               <ItemContent>
                 <ItemTitle>Pagamentos</ItemTitle>
