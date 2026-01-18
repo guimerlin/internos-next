@@ -40,7 +40,7 @@ async function fetchUserData(userId: string): Promise<User> {
       userSnap.docs.length > 0
         ? {
             uid: userSnap.docs[0].id,
-            ...(userSnap.docs[0].data() as any),
+            ...(userSnap.docs[0].data() as User),
           }
         : { uid: userId };
 
@@ -74,7 +74,7 @@ const page = async () => {
 
       {/* Grid Layout: Resolve o problema de alinhamento */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {userData.holerites.length > 0 ? (
+        {userData.holerites && userData.holerites.length > 0 ? (
           userData.holerites.map((holerite) => (
             <Card
               key={holerite.id}

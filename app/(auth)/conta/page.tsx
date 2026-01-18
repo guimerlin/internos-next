@@ -22,6 +22,9 @@ import {
 import UserInfo from './UserInfo';
 import EditInfo from './EditInfo';
 import { redirect } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
+import { User } from '@/types';
 
 const page = async ({
   searchParams,
@@ -29,10 +32,20 @@ const page = async ({
   searchParams: Promise<{ action: string }>;
 }) => {
   const session = await auth();
-  const user = session?.user;
+  const userAuth = session?.user as User;
   const SearchParams = await searchParams;
 
-  if (!user) return redirect('/login');
+  if (!userAuth) return redirect('/login');
+
+  const userRef = doc(db, 'users', userAuth.id as string);
+  const userSnap = await getDoc(userRef);
+
+  // 3. Verificamos se o usuário existe
+  if (!userSnap.exists()) {
+    return redirect('/login');
+  }
+
+  const user = { ...userAuth, ...(userSnap.data() as User) };
 
   return (
     <div className="mx-8 my-20 flex flex-col items-center justify-center">
