@@ -16,9 +16,10 @@ import {
   ItemDescription,
   ItemTitle,
 } from '@/components/ui/item';
+import { User } from '@/types';
 
 interface UserInfoProps {
-  user: any;
+  user: User;
 }
 
 const UserInfo = ({ user }: UserInfoProps) => {
@@ -34,13 +35,13 @@ const UserInfo = ({ user }: UserInfoProps) => {
         <Item variant="default">
           <ItemContent>
             <ItemTitle>Nome:</ItemTitle>
-            <ItemDescription>{user?.name}</ItemDescription>
+            <ItemDescription>{user?.fullName}</ItemDescription>
           </ItemContent>
         </Item>
         <Item variant="default">
           <ItemContent>
-            <ItemTitle>Email:</ItemTitle>
-            <ItemDescription>{user?.email}</ItemDescription>
+            <ItemTitle>Username:</ItemTitle>
+            <ItemDescription>{user?.username}</ItemDescription>
           </ItemContent>
         </Item>
       </CardContent>

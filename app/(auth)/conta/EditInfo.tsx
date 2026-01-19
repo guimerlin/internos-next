@@ -17,9 +17,10 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { save } from './actions';
+import { User } from '@/types';
 
 interface UserInfoProps {
-  user: any;
+  user: User;
 }
 
 const EditInfo = ({ user }: UserInfoProps) => {
@@ -34,20 +35,51 @@ const EditInfo = ({ user }: UserInfoProps) => {
         </CardDescription>
       </CardHeader>
       <form action={save}>
-        <input type="hidden" name="userId" value={user.id} />
         <CardContent>
           <Item variant="default">
             <ItemContent>
               <ItemTitle>
-                <label htmlFor="name">Nome:</label>
+                <label htmlFor="fullName">Nome:</label>
               </ItemTitle>
               <ItemDescription>
                 <input
                   type="text"
-                  name="name"
-                  id="name"
-                  defaultValue={user?.name}
+                  name="fullName"
+                  id="fullName"
+                  placeholder={user?.fullName || 'Seu Nome Completo'}
                   className="rounded-sm border border-gray-800 p-1 text-gray-900"
+                />
+              </ItemDescription>
+            </ItemContent>
+          </Item>
+          <Item variant="default">
+            <ItemContent>
+              <ItemTitle>
+                <label htmlFor="username">Username:</label>
+              </ItemTitle>
+              <ItemDescription>
+                <input
+                  type="text"
+                  name="username"
+                  id="username"
+                  placeholder={user?.username}
+                  className="rounded-sm border border-gray-800 p-1 text-gray-900"
+                />
+              </ItemDescription>
+            </ItemContent>
+          </Item>
+          <Item variant="default">
+            <ItemContent>
+              <ItemTitle>
+                <label htmlFor="password">Senha:</label>
+              </ItemTitle>
+              <ItemDescription>
+                <input
+                  type="text"
+                  name="password"
+                  id="password"
+                  className="rounded-sm border border-gray-800 p-1 text-gray-900"
+                  placeholder="Sua nova Senha"
                 />
               </ItemDescription>
             </ItemContent>

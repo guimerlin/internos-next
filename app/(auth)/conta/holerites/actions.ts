@@ -1,7 +1,6 @@
 'use server';
 
-import { db } from '@/lib/firebase/config';
-import { doc, updateDoc } from 'firebase/firestore';
+import { api } from '@/lib/api';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -17,10 +16,7 @@ export async function view(formData: FormData) {
   }
 
   try {
-    const holeriteRef = doc(db, 'holerites', holeriteId);
-    await updateDoc(holeriteRef, {
-      view: true,
-    });
+    await api(`/user/payslips/${holeriteId}/view`, { method: 'PATCH' });
     revalidatePath('/conta/holerites');
     redirect(imageLink);
   } catch (e) {

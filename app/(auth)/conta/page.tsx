@@ -22,9 +22,8 @@ import {
 import UserInfo from './UserInfo';
 import EditInfo from './EditInfo';
 import { redirect } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { User } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const page = async ({
   searchParams,
@@ -32,36 +31,34 @@ const page = async ({
   searchParams: Promise<{ action: string }>;
 }) => {
   const session = await auth();
-  const userAuth = session?.user as User;
+  const user = session?.user;
   const SearchParams = await searchParams;
 
-  if (!userAuth) return redirect('/login');
+  if (!user) return redirect('/login');
 
-  const userRef = doc(db, 'users', userAuth.id as string);
-  const userSnap = await getDoc(userRef);
-
-  // 3. Verificamos se o usuário existe
-  if (!userSnap.exists()) {
-    return redirect('/login');
-  }
-
-  const user = { ...userAuth, ...(userSnap.data() as User) };
+  const initials = user.fullName
+    ? user.fullName
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((n) => n[0])
+        .filter((_, i, a) => i === 0 || i === a.length - 1)
+        .join('')
+        .toUpperCase()
+    : 'U';
 
   return (
     <div className="mx-8 my-20 flex flex-col items-center justify-center">
       <div className="flex items-center gap-5">
-        {user?.image && (
-          <Image
-            src={user?.image}
-            width={100}
-            height={100}
-            alt="User Profile"
-            className="rounded-full border-3 border-gray-300"
-          />
-        )}
+        <Avatar className="h-[100] w-[100]">
+          <AvatarImage src={user.image} />
+          <AvatarFallback title={user.fullName} className="">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
         <div className="">
-          <p className="text-xl font-semibold">Bem vindo, {user?.name}!</p>
-          <p className="text-sm font-light text-gray-500">{user?.email}</p>
+          <p className="text-xl font-semibold">Bem vindo, {user?.fullName}!</p>
+          <p className="text-sm font-light text-gray-500">{user?.username}</p>
           <form action={logout}>
             <Button variant="link" type="submit">
               Não é você?
@@ -84,7 +81,7 @@ const page = async ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {user.admin && (
+            {user.role === 'admin' && (
               <Item variant="outline">
                 <ItemContent>
                   <ItemTitle>Admin</ItemTitle>

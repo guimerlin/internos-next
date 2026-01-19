@@ -1,44 +1,60 @@
 'use server';
 
-import { db } from '@/lib/firebase/config';
 import { uploadImage } from '@/lib/imageKit';
-import { addDoc, collection, deleteDoc, doc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
+import { api } from '@/lib/api';
 
 export async function uploadHolerite(formData: FormData) {
-  const userId = formData.get('userId') as string;
+  // 1. Extração de todos os campos do FormData
+  const userId = formData.get('userId');
   const natureza = formData.get('natureza') as string;
+  const referenciaMes = formData.get('referenciaMes') as string;
+  const dataEmissao = formData.get('dataEmissao') as string;
   const file = formData.get('image') as File;
 
+  // 2. Validação básica
   if (!file || file.size === 0) {
-    throw new Error('Arquivo inválido');
+    return { success: false, error: 'Arquivo inválido ou não selecionado' };
+  }
+
+  if (!userId || !natureza || !referenciaMes || !dataEmissao) {
+    return { success: false, error: 'Todos os campos são obrigatórios' };
   }
 
   try {
-    const response = await uploadImage(file);
+    const fileUrl = await uploadImage(file);
 
-    await addDoc(collection(db, 'holerites'), {
-      natureza: natureza,
-      imagem: response,
-      view: false,
-      data: new Date().toISOString(),
-      targetUid: userId,
-      uid: userId,
-      createdAt: new Date().toISOString(),
+    const response = await api('/admin/payslips', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: Number(userId),
+        natureza,
+        fileUrl,
+        referenciaMes,
+        dataEmissao,
+      }),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Erro ao salvar no banco de dados');
+    }
 
     revalidatePath('/dashboard');
     return { success: true };
-  } catch (error) {
-    console.error('Erro no upload:', error);
-    return { success: false, error: 'Falha ao processar upload' };
+  } catch (error: any) {
+    console.error('Erro no processo de upload de holerite:', error);
+    return {
+      success: false,
+      error: error.message || 'Falha ao processar upload',
+    };
   }
 }
 
 export async function exclude(formData: FormData) {
   const id = formData.get('id') as string;
   try {
-    await deleteDoc(doc(db, 'holerites', id));
+    await api(`/admin/payslips/${id}`, { method: 'DELETE' });
     revalidatePath('/admin/dashboard');
   } catch (e) {
     console.error('Erro ao remover holerite:', e);

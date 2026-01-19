@@ -2,14 +2,8 @@
 
 import { signOut } from '@/auth';
 import { redirect } from 'next/navigation';
-import { db } from '@/lib/firebase/config';
-import { updateDoc, doc, collection } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-
-export async function changeName(formData: FormData) {
-  const name = formData.get('name');
-  console.log(name);
-}
+import { api } from '@/lib/api';
 
 export async function logout() {
   await signOut({ redirect: false });
@@ -17,25 +11,33 @@ export async function logout() {
 }
 
 export async function save(formData: FormData) {
-  const name = formData.get('name') as string;
-  const userId = formData.get('userId') as string;
+  const fullName = formData.get('fullName') as string;
+  const password = formData.get('password') as string;
+  const username = formData.get('username') as string;
 
-  if (!userId || !name) {
-    throw new Error('ID do usuário ou nome não fornecidos.');
+  if (!fullName && !password && !username) {
+    throw new Error('Nenhuma informação para atualizar');
   }
 
-  try {
-    const userRef = doc(db, 'users', userId);
+  const updateData = {
+    ...(fullName && { fullName }),
+    ...(password && { password }),
+    ...(username && { username }),
+  };
 
-    await updateDoc(userRef, {
-      name: name,
-      updatedAt: new Date().toISOString(),
+  try {
+    const response = await api('/user/profile', {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+      cache: 'no-store',
     });
 
-    revalidatePath('/perfil');
-    redirect('/conta');
+    if (!response.ok) {
+      throw new Error('Erro ao salvar no banco');
+    }
 
-    return;
+    revalidatePath('/conta');
+    redirect('/conta');
   } catch (error) {
     console.error('Erro ao salvar no banco:', error);
     return;

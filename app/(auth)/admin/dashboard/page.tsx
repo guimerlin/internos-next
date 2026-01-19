@@ -1,10 +1,8 @@
 import React from 'react';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { db } from '@/lib/firebase/config';
 import Image from 'next/image';
-import { collection, getDocs } from 'firebase/firestore';
-import { Holerite, User } from '@/types';
+import { UserWithPayslips } from '@/types';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,52 +12,28 @@ import { Button } from '@/components/ui/button';
 import { Trash } from 'lucide-react';
 import { exclude } from './action';
 import Link from 'next/link';
-
-async function fetchAllUsersWithData(): Promise<User[]> {
-  try {
-    const [holeritesSnap, usersSnap] = await Promise.all([
-      getDocs(collection(db, 'holerites')),
-      getDocs(collection(db, 'users')),
-    ]);
-
-    const holeritesPorUsuario: Record<string, Holerite[]> = {};
-
-    holeritesSnap.forEach((doc) => {
-      const data = doc.data() as Omit<Holerite, 'id'>;
-      const holerite = { id: doc.id, ...data };
-      const userUid = data.uid;
-
-      if (!holeritesPorUsuario[userUid]) {
-        holeritesPorUsuario[userUid] = [];
-      }
-      holeritesPorUsuario[userUid].push(holerite);
-    });
-
-    const users: User[] = usersSnap.docs.map((doc) => {
-      const userData = doc.data();
-      const uid = userData.uid || doc.id;
-
-      return {
-        uid: doc.id,
-        ...userData,
-        holerites: holeritesPorUsuario[uid] || [],
-      } as User;
-    });
-
-    return users;
-  } catch (e) {
-    console.error('Erro ao buscar todos os usuários e holerites:', e);
-    throw e;
-  }
-}
+import { api } from '@/lib/api';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const page = async () => {
   const session = await auth();
   const user = session?.user;
+  if (!user || user.role !== 'admin') return redirect('/login');
 
-  const users = await fetchAllUsersWithData();
+  const initials = user.fullName
+    ? user.fullName
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((n) => n[0])
+        .filter((_, i, a) => i === 0 || i === a.length - 1)
+        .join('')
+        .toUpperCase()
+    : 'U';
 
-  if (!user) return redirect('/login');
+  const users = (await (
+    await api('/admin/users-with-payslips')
+  ).json()) as UserWithPayslips[];
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -67,13 +41,12 @@ const page = async () => {
       <div className="mt-10 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center justify-center">
           <div className="pb-5">
-            <Image
-              src={user.image as string}
-              alt="User image"
-              width={100}
-              height={100}
-              className="rounded-full border-2 border-red-600 shadow-lg"
-            />
+            <Avatar className="h-[100] w-[100] border-2 border-red-600">
+              <AvatarImage src={user.image} />
+              <AvatarFallback title={user.fullName} className="">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
           </div>
           <p className="text-xl font-bold text-gray-900">
             Painel Administrativo
@@ -81,7 +54,7 @@ const page = async () => {
           <p className="text-sm font-extralight text-gray-500">
             Fazendo alterações em nome de
           </p>
-          <p className="pt-2 font-semibold text-gray-800">{user.name}</p>
+          <p className="pt-2 font-semibold text-gray-800">{user.fullName}</p>
         </div>
       </div>
 
@@ -94,29 +67,33 @@ const page = async () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {users.map((colaborador) => (
             <Card
-              key={colaborador.uid}
+              key={colaborador.id}
               className="overflow-hidden shadow-sm transition-shadow hover:shadow-md"
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-white pb-2">
                 <div className="flex items-center gap-3">
                   {/* Avatar do Colaborador (Fallback se não tiver imagem) */}
-                  <div className="relative h-10 w-10 overflow-hidden rounded-full border border-gray-200">
-                    {colaborador.image ? (
-                      <Image
-                        src={colaborador.image}
-                        alt={colaborador.name as string}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-100 text-xs font-bold text-gray-500">
-                        {colaborador.name?.substring(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
+                  <Avatar className="">
+                    <AvatarImage src={colaborador.image} />
+                    <AvatarFallback
+                      title={colaborador.fullName || colaborador.username}
+                      className=""
+                    >
+                      {colaborador.fullName
+                        ? colaborador.fullName
+                            .trim()
+                            .split(/\s+/)
+                            .filter(Boolean)
+                            .map((n) => n[0])
+                            .filter((_, i, a) => i === 0 || i === a.length - 1)
+                            .join('')
+                            .toUpperCase()
+                        : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <CardTitle className="text-base font-bold">
-                      {colaborador.name || colaborador.nome}
+                      {colaborador.fullName || colaborador.username}
                     </CardTitle>
                     <p className="text-muted-foreground text-xs">
                       {colaborador.role || 'Colaborador'}
@@ -126,8 +103,8 @@ const page = async () => {
 
                 {/* BOTÃO DIALOG DE UPLOAD AQUI */}
                 <HoleriteUploadDialog
-                  userId={colaborador.uid as string}
-                  userName={colaborador.name as string}
+                  userId={colaborador.id}
+                  userName={colaborador.fullName || colaborador.username}
                 />
               </CardHeader>
 
@@ -138,13 +115,12 @@ const page = async () => {
                   </p>
 
                   <ScrollArea className="h-30 rounded-md border bg-gray-50 p-2">
-                    {colaborador.holerites &&
-                    colaborador.holerites.length > 0 ? (
+                    {colaborador.payslips && colaborador.payslips.length > 0 ? (
                       <ul className="space-y-2">
-                        {colaborador.holerites.map((holerite) => (
+                        {colaborador.payslips.map((holerite) => (
                           <Link
                             key={holerite.id}
-                            href={holerite.imagem as string}
+                            href={holerite.fileUrl as string}
                             className="flex items-center justify-between rounded bg-white p-2 text-sm shadow-sm"
                           >
                             <div className="flex items-center gap-2">
@@ -157,7 +133,9 @@ const page = async () => {
                               <Calendar className="h-3 w-3" />
                               {/* Exemplo de data, ajuste conforme seu banco */}
                               <span>
-                                {new Date(holerite.data).toLocaleDateString()}
+                                {new Date(
+                                  holerite.dataEmissao,
+                                ).toLocaleDateString()}
                               </span>
                               <form action={exclude}>
                                 <input
@@ -184,7 +162,7 @@ const page = async () => {
                   </ScrollArea>
 
                   <div className="text-muted-foreground mt-4 flex items-start justify-between text-xs">
-                    <span>Total: {colaborador.holerites?.length || 0}</span>
+                    <span>Total: {colaborador.payslips?.length || 0}</span>
                   </div>
                 </div>
               </CardContent>

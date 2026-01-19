@@ -1,7 +1,5 @@
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { auth } from '@/auth';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import {
   Card,
   CardTitle,
@@ -10,57 +8,19 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { Holerite, User } from '@/types';
+import { Payslip } from '@/types';
 import Image from 'next/image';
 import { view } from './actions';
 import { Button } from '@/components/ui/button';
-
-async function fetchUserData(userId: string): Promise<User> {
-  try {
-    const holeritesQuery = query(
-      collection(db, 'holerites'),
-      where('uid', '==', userId),
-    );
-    const userDocQuery = query(
-      collection(db, 'users'),
-      where('uid', '==', userId),
-    );
-
-    const [holeritesSnap, userSnap] = await Promise.all([
-      getDocs(holeritesQuery),
-      getDocs(userDocQuery),
-    ]);
-
-    const holerites = holeritesSnap.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Holerite, 'id'>),
-    })) as Holerite[];
-
-    const userData =
-      userSnap.docs.length > 0
-        ? {
-            uid: userSnap.docs[0].id,
-            ...(userSnap.docs[0].data() as User),
-          }
-        : { uid: userId };
-
-    return {
-      ...userData,
-      holerites,
-    } as User;
-  } catch (e) {
-    console.error('Erro ao buscar dados do usuário:', e);
-    throw e;
-  }
-}
+import { api } from '@/lib/api';
 
 const page = async () => {
   const session = await auth();
   const user = session?.user;
 
-  if (!user || !user.id) notFound();
+  if (!user || !user.id) redirect('/login');
 
-  const userData = await fetchUserData(user.id);
+  const userData = (await (await api('/user/payslips')).json()) as Payslip[];
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-12">
@@ -74,12 +34,12 @@ const page = async () => {
 
       {/* Grid Layout: Resolve o problema de alinhamento */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {userData.holerites && userData.holerites.length > 0 ? (
-          userData.holerites.map((holerite) => (
+        {userData && userData.length > 0 ? (
+          userData.map((holerite) => (
             <Card
               key={holerite.id}
               className={`flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg ${
-                !holerite.view
+                !holerite.viewed
                   ? 'border-blue-500/50 shadow-md ring-1 ring-blue-500/20'
                   : ''
               }`}
@@ -91,14 +51,14 @@ const page = async () => {
                   </CardTitle>
 
                   {/* Badge de 'Novo' feita com Tailwind puro para não depender de outro componente */}
-                  {!holerite.view && (
+                  {!holerite.viewed && (
                     <span className="inline-flex shrink-0 items-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
                       Novo
                     </span>
                   )}
                 </div>
                 <CardDescription>
-                  {new Date(holerite.createdAt).toLocaleDateString('pt-BR', {
+                  {new Date(holerite.dataEmissao).toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric',
@@ -111,7 +71,7 @@ const page = async () => {
                 <div className="bg-muted/30 relative h-48 w-full overflow-hidden rounded-md border">
                   {/* O 'fill' faz a imagem ocupar o container 'relative' acima sem estourar */}
                   <Image
-                    src={holerite.imagem}
+                    src={holerite.fileUrl}
                     alt={holerite.natureza}
                     fill
                     className="object-contain p-2 transition-transform duration-500 hover:scale-105"
@@ -126,20 +86,22 @@ const page = async () => {
                   <input
                     type="hidden"
                     name="view"
-                    value={holerite.view ? 'S' : 'N'}
+                    value={holerite.viewed ? 'S' : 'N'}
                   />
                   <input
                     type="hidden"
                     name="imageLink"
-                    value={holerite.imagem}
+                    value={holerite.fileUrl}
                   />
 
                   <Button
                     type="submit"
                     className="w-full"
-                    variant={!holerite.view ? 'default' : 'outline'}
+                    variant={!holerite.viewed ? 'default' : 'outline'}
                   >
-                    {!holerite.view ? 'Visualizar Documento' : 'Ver Novamente'}
+                    {!holerite.viewed
+                      ? 'Visualizar Documento'
+                      : 'Ver Novamente'}
                   </Button>
                 </form>
               </CardFooter>
