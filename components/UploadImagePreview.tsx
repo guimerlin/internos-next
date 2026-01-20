@@ -2,8 +2,8 @@
 
 import React, { useState, useRef } from 'react';
 
-const ImageUploadPreview = ({ prevPreview }: { prevPreview: string }) => {
-  const [preview, setPreview] = useState<string | null>(prevPreview);
+const ImageUploadPreview = ({ prevPreview }: { prevPreview?: string }) => {
+  const [preview, setPreview] = useState<string | null>(prevPreview || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

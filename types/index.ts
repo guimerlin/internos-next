@@ -34,6 +34,7 @@ export interface Session {
     username: string;
     role: 'admin' | 'user';
     fullName?: string;
+    image?: string;
   };
   expires: string; // ISO Date String
 }

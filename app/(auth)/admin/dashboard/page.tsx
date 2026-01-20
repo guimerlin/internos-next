@@ -1,7 +1,5 @@
-import React from 'react';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import { UserWithPayslips } from '@/types';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';

@@ -7,7 +7,6 @@ import {
   Truck,
   HeartHandshake,
   AlertCircle,
-  FileText,
   Target,
   Eye,
   Award,

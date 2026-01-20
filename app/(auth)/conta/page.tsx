@@ -21,6 +21,7 @@ import UserInfo from './UserInfo';
 import EditInfo from './EditInfo';
 import { redirect } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User } from '@/types';
 
 const page = async ({
   searchParams,
@@ -65,9 +66,9 @@ const page = async ({
       </div>
       <div className="mt-10 flex w-full flex-col items-center justify-center gap-2 md:flex-row md:items-start md:justify-center">
         {SearchParams.action !== 'edit' ? (
-          <UserInfo user={user} />
+          <UserInfo user={user as User} />
         ) : (
-          <EditInfo user={user} />
+          <EditInfo user={user as User} />
         )}
 
         <Card className="w-auto">

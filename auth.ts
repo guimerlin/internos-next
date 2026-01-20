@@ -77,11 +77,12 @@ export async function signUp(formData: FormData) {
       },
     );
 
-    if (!response.ok) return null;
+    if (!response.ok) throw new Error('Erro ao criar usuário');
+    revalidatePath('/');
     Redirect('/login');
   } catch (error) {
     console.error('Erro na criação de usuário via Worker:', error);
-    return null;
+    throw new Error('Erro ao criar usuário');
   }
 }
 
@@ -101,7 +102,7 @@ export async function signIn(formData: FormData) {
     );
 
     if (!response.ok) {
-      return { error: 'Credenciais inválidas' };
+      throw new Error('Erro no login');
     }
 
     const setCookieHeader = response.headers.get('set-cookie');
@@ -124,7 +125,7 @@ export async function signIn(formData: FormData) {
     // cookieStore.set('auth_token', data.token, { ... });
   } catch (error) {
     console.error('Erro no login:', error);
-    return;
+    throw new Error('Erro no login');
   }
 
   revalidatePath('/');

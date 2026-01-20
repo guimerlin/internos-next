@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    const data = await workerRes.json();
+    await workerRes.json();
     const response = NextResponse.next();
     const newCookieHeader = workerRes.headers.get('set-cookie');
 

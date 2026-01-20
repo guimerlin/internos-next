@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import logo from '@/public/favicon.png';
 import Image from 'next/image';
 import { Bell, BookOpen, DollarSign, Rocket } from 'lucide-react';

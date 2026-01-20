@@ -4,13 +4,10 @@ import {
   CardHeader,
   CardDescription,
   CardTitle,
-  CardContent,
   CardFooter,
   CardAction,
 } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { buttonVariants } from '@/components/ui/button';
 import { NotebookText, LayoutGrid } from 'lucide-react';
 
 export default async function Ferramentas() {
