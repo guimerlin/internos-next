@@ -47,20 +47,37 @@ export async function ProfileDropdown() {
           <Link href="/conta">
             <DropdownMenuItem>Perfil</DropdownMenuItem>
           </Link>
-          <Link href="/conta/pagamentos">
+          {/* <Link href="/conta/pagamentos">
             <DropdownMenuItem disabled>Pagamentos</DropdownMenuItem>
-          </Link>
+          </Link> */}
           <Link href="/conta/holerites">
             <DropdownMenuItem>Holerites</DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        {user.role === 'admin' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Administração</DropdownMenuLabel>
+              <Link href="/admin">
+                <DropdownMenuItem>Administração</DropdownMenuItem>
+              </Link>
+              <Link href="/admin/dashboard">
+                <DropdownMenuItem>Pagamentos</DropdownMenuItem>
+              </Link>
+              <Link href="/admin/users">
+                <DropdownMenuItem>Usuários</DropdownMenuItem>
+              </Link>
+              <Link href="/admin/stores">
+                <DropdownMenuItem disabled>Lojas</DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+          </>
+        )}
+        {/* <DropdownMenuSeparator />
           <DropdownMenuItem disabled>Avisos</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuItem disabled>Suporte</DropdownMenuItem>
-        <DropdownMenuItem disabled>Cursos</DropdownMenuItem>
+        <DropdownMenuItem disabled>Cursos</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <form action={logout}>

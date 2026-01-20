@@ -88,7 +88,7 @@ const page = async ({
                 </ItemContent>
                 <ItemActions>
                   <Link
-                    href="/admin/dashboard"
+                    href="/admin"
                     className={buttonVariants({ variant: 'outline' })}
                   >
                     Abrir
