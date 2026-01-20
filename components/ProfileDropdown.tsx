@@ -33,7 +33,7 @@ export async function ProfileDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
           <div className="flex items-center gap-2">
-            <p>{user.fullName}</p>
+            <p className="hidden md:block">{user.fullName}</p>
             <Avatar>
               <AvatarImage src={user.image} />
               <AvatarFallback title={user.fullName}>{initials}</AvatarFallback>

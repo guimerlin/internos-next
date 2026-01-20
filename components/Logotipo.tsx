@@ -13,7 +13,9 @@ const Logotipo = async () => {
           height={19}
         />
       </div>
-      <span className="font-semibold text-red-600">Rede Cesária</span>
+      <span className="hidden font-semibold text-red-600 md:block">
+        Rede Cesária
+      </span>
     </div>
   );
 };
