@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/item';
 import { save } from './actions';
 import { User } from '@/types';
+import ImageUploadPreview from '@/components/UploadImagePreview';
 
 interface UserInfoProps {
   user: User;
@@ -36,6 +37,9 @@ const EditInfo = ({ user }: UserInfoProps) => {
       </CardHeader>
       <form action={save}>
         <CardContent>
+          <div>
+            <ImageUploadPreview prevPreview={user?.image as string} />
+          </div>
           <Item variant="default">
             <ItemContent>
               <ItemTitle>

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect as Redirect } from 'next/navigation';
 import { Session } from './types';
+import { uploadImage } from './lib/imageKit';
 
 export async function auth(): Promise<Session | null> {
   const cookieStore = await cookies();
@@ -43,11 +44,26 @@ export async function auth(): Promise<Session | null> {
   }
 }
 
-export async function signUp(
-  username: string,
-  password: string,
-  fullName?: string,
-) {
+export async function signUp(formData: FormData) {
+  const fullName = formData.get('fullName') as string;
+  const username = formData.get('username') as string;
+  const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
+  const image = formData.get('profileImage') as File;
+
+  if (password !== confirmPassword) {
+    throw new Error('As senhas não coincidem');
+  }
+
+  const bodyData = {} as any;
+  if (image.size === 0) {
+    const imageUrl = await uploadImage(image);
+    bodyData.image = imageUrl;
+  }
+  bodyData.username = username;
+  bodyData.password = password;
+  bodyData.fullName = fullName;
+
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_WORKER_URL}/auth/register`,
@@ -56,11 +72,7 @@ export async function signUp(
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username,
-          password,
-          fullName,
-        }),
+        body: JSON.stringify(bodyData),
         cache: 'no-store',
       },
     );

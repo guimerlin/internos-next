@@ -4,6 +4,7 @@ import { signOut } from '@/auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { api } from '@/lib/api';
+import { uploadImage } from '@/lib/imageKit';
 
 export async function logout() {
   await signOut({ redirect: false });
@@ -14,8 +15,9 @@ export async function save(formData: FormData) {
   const fullName = formData.get('fullName') as string;
   const password = formData.get('password') as string;
   const username = formData.get('username') as string;
+  const file = formData.get('profileImage') as File;
 
-  if (!fullName && !password && !username) {
+  if (!fullName && !password && !username && file.size === 0) {
     throw new Error('Nenhuma informação para atualizar');
   }
 
@@ -23,6 +25,7 @@ export async function save(formData: FormData) {
     ...(fullName && { fullName }),
     ...(password && { password }),
     ...(username && { username }),
+    ...(file && { image: await uploadImage(file) }),
   };
 
   try {

@@ -1,6 +1,4 @@
-import React from 'react';
 import { auth } from '@/auth';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { logout } from './actions';
@@ -22,7 +20,6 @@ import {
 import UserInfo from './UserInfo';
 import EditInfo from './EditInfo';
 import { redirect } from 'next/navigation';
-import { User } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const page = async ({

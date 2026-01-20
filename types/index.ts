@@ -7,6 +7,7 @@ export interface User {
   fullName: string | null;
   role: 'admin' | 'user';
   createdAt?: Date | string;
+  image?: string;
 }
 
 /**

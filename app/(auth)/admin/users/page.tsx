@@ -12,21 +12,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-  UserCog,
-  Trash2,
-  KeyRound,
-  UserPlus,
-  ShieldCheck,
-  User as UserIcon,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { UserCog, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-// Componentes que você teria (Modais/Dialogs)
-// import { EditUserDialog } from "./_components/edit-user-dialog";
-// import { DeleteUserDialog } from "./_components/delete-user-dialog";
-// import { ResetPasswordDialog } from "./_components/reset-password-dialog";
-// import { CreateUserDialog } from "./_components/create-user-dialog";
+import { EditUserDialog } from './EditUserDialog';
+import { DeleteUserDialog } from './DeleteUserDialog';
+import { ResetPasswordDialog } from './ResetPasswordDialog';
+import { CreateUserDialog } from './CreateUserDialog';
 
 const UsersAdminPage = async () => {
   const session = await auth();
@@ -37,7 +29,7 @@ const UsersAdminPage = async () => {
 
   // Busca de usuários
   const response = await api('/admin/users');
-  const users = await response.json();
+  const users = (await response.json()) as User[];
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-10">
@@ -53,17 +45,14 @@ const UsersAdminPage = async () => {
         </div>
 
         {/* Componente para criar novo usuário */}
-        {/* <CreateUserDialog /> */}
-        <Button className="flex gap-2">
-          <UserPlus className="h-4 w-4" /> Criar Usuário
-        </Button>
+        <CreateUserDialog />
       </div>
 
       <div className="overflow-hidden rounded-md border bg-white shadow-sm">
         <Table>
           <TableHeader className="bg-gray-50/50">
             <TableRow>
-              <TableHead className="w-[100px]">Iniciais</TableHead>
+              <TableHead className="w-25">Iniciais</TableHead>
               <TableHead>Nome Completo</TableHead>
               <TableHead>Username</TableHead>
               <TableHead>Cargo / Nível</TableHead>
@@ -78,15 +67,26 @@ const UsersAdminPage = async () => {
                   className="transition-colors hover:bg-gray-50/50"
                 >
                   <TableCell>
-                    <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold">
-                      {user.fullName
-                        ?.trim()
-                        .split(/\s+/)
-                        .map((n) => n[0])
-                        .filter((_, i, a) => i === 0 || i === a.length - 1)
-                        .join('')
-                        .toUpperCase() || '??'}
-                    </div>
+                    <Avatar className="">
+                      <AvatarImage src={user.image} />
+                      <AvatarFallback
+                        title={user.fullName || user.username}
+                        className=""
+                      >
+                        {user.fullName
+                          ? user.fullName
+                              .trim()
+                              .split(/\s+/)
+                              .filter(Boolean)
+                              .map((n) => n[0])
+                              .filter(
+                                (_, i, a) => i === 0 || i === a.length - 1,
+                              )
+                              .join('')
+                              .toUpperCase()
+                          : 'U'}
+                      </AvatarFallback>
+                    </Avatar>
                   </TableCell>
                   <TableCell className="font-medium">
                     {user.fullName || 'Sem nome cadastrado'}
@@ -109,39 +109,12 @@ const UsersAdminPage = async () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      {/* Botão Resetar Senha */}
-                      {/* <ResetPasswordDialog userId={user.id} /> */}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title="Resetar Senha"
-                        className="h-8 w-8 border-orange-200 text-orange-600 hover:bg-orange-50"
-                      >
-                        <KeyRound className="h-4 w-4" />
-                      </Button>
-
-                      {/* Botão Editar Info */}
-                      {/* <EditUserDialog user={user} /> */}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title="Editar Usuário"
-                        className="h-8 w-8 border-blue-200 text-blue-600 hover:bg-blue-50"
-                      >
-                        <UserCog className="h-4 w-4" />
-                      </Button>
-
-                      {/* Botão Deletar (Não permite deletar a si mesmo) */}
-                      {/* <DeleteUserDialog userId={user.id} disabled={user.id === currentUser.id} /> */}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title="Excluir Usuário"
-                        className="h-8 w-8 border-red-200 text-red-600 hover:bg-red-50"
+                      <ResetPasswordDialog userId={user.id} />
+                      <EditUserDialog user={user} />
+                      <DeleteUserDialog
+                        userId={user.id}
                         disabled={user.id === currentUser.id}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

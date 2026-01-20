@@ -1,10 +1,11 @@
-import { auth, signIn } from '@/auth';
+import { auth, signUp } from '@/auth';
 import { LogIn, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import logo from '@/public/favicon.png';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import ImageUploadPreview from '@/components/UploadImagePreview';
 import { buttonVariants } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function SignIn() {
   const session = await auth();
@@ -24,7 +25,7 @@ export default async function SignIn() {
           Rede Cesaria
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
-          Acesse o seu Portal do Colaborador
+          Cadastre-se no Portal do Colaborador
         </p>
       </div>
 
@@ -33,11 +34,30 @@ export default async function SignIn() {
           <div className="space-y-6">
             <div>
               <p className="mb-4 text-center text-sm font-medium text-slate-700">
-                Utilize seu usuário e senha para entrar.
+                Preencha os campos abaixo para se registrar.
               </p>
 
-              <form action={signIn}>
+              <form action={signUp}>
                 <div className="mb-8 flex w-full flex-col items-start justify-center gap-2">
+                  <div className="w-full pb-8">
+                    <ImageUploadPreview />
+                  </div>
+                  <div className="w-full">
+                    <label
+                      htmlFor="fullName"
+                      className="mb-1 block text-sm font-medium text-slate-700"
+                    >
+                      Nome Completo
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      placeholder="Seu nome Completo"
+                      id="fullName"
+                      required
+                      className="w-full rounded-md border border-gray-400 p-2 text-gray-900"
+                    />
+                  </div>
                   <div className="w-full">
                     <label
                       htmlFor="username"
@@ -62,10 +82,26 @@ export default async function SignIn() {
                       Senha
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       name="password"
                       placeholder="Sua Senha"
                       id="password"
+                      required
+                      className="w-full rounded-md border border-gray-400 p-2 text-gray-900"
+                    />
+                  </div>
+                  <div className="w-full">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="mb-1 block text-sm font-medium text-slate-700"
+                    >
+                      Confirme sua Senha
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="Confirme sua Senha"
+                      id="confirmPassword"
                       required
                       className="w-full rounded-md border border-gray-400 p-2 text-gray-900"
                     />
@@ -76,7 +112,7 @@ export default async function SignIn() {
                   className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-400 hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98]"
                 >
                   <LogIn size={16} />
-                  Entrar
+                  Cadastrar
                 </button>
               </form>
             </div>
@@ -86,12 +122,14 @@ export default async function SignIn() {
                 <div className="w-full border-t border-slate-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <Link
-                  href="/cadastro"
-                  className={buttonVariants({ variant: 'link' })}
-                >
-                  Não tem uma conta?
-                </Link>
+                <span className="bg-white px-2 font-medium text-slate-400 italic">
+                  <Link
+                    href="/login"
+                    className={buttonVariants({ variant: 'link' })}
+                  >
+                    Já tem uma conta?
+                  </Link>
+                </span>
               </div>
             </div>
 

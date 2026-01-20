@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { UserPlus } from 'lucide-react';
-import { createUserAction } from './actions'; // Importe seu mock ou action real
+import { createUserAction } from './actions';
+import ImageUploadPreview from '@/components/UploadImagePreview';
 
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ export function CreateUserDialog() {
           <UserPlus className="h-4 w-4" /> Criar Usuário
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Novo Usuário</DialogTitle>
           <DialogDescription>
@@ -49,6 +50,11 @@ export function CreateUserDialog() {
           }}
           className="grid gap-4 py-4"
         >
+          {/* Foto */}
+          <div className="grid gap-2">
+            <ImageUploadPreview />
+          </div>
+
           {/* Nome Completo */}
           <div className="grid gap-2">
             <Label htmlFor="fullName">Nome Completo</Label>

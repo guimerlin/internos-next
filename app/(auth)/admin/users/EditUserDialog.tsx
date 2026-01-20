@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/select';
 import { UserCog } from 'lucide-react';
 import { updateUserAction } from './actions';
-import { User } from '@/types'; // Sua interface User
+import { User } from '@/types';
+import ImageUploadPreview from '@/components/UploadImagePreview';
 
 export function EditUserDialog({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ export function EditUserDialog({ user }: { user: User }) {
           <UserCog className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Editar Usuário</DialogTitle>
           <DialogDescription>
@@ -56,6 +57,11 @@ export function EditUserDialog({ user }: { user: User }) {
           className="grid gap-4 py-4"
         >
           <input type="hidden" name="userId" value={user.id} />
+
+          {/* Perfil */}
+          <div className="grid gap-2 pb-8">
+            <ImageUploadPreview prevPreview={user.image as string} />
+          </div>
 
           {/* Nome */}
           <div className="grid gap-2">
