@@ -22,9 +22,9 @@ export async function save(formData: FormData) {
   }
 
   const updateData = {
-    ...(fullName && { fullName }),
-    ...(password && { password }),
-    ...(username && { username }),
+    ...(fullName && { fullName: fullName.trim() }),
+    ...(password && { password: password.trim() }),
+    ...(username && { username: username.trim() }),
     ...(file && { image: await uploadImage(file) }),
   };
 

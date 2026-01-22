@@ -28,7 +28,7 @@ export async function uploadHolerite(formData: FormData) {
       method: 'POST',
       body: JSON.stringify({
         userId: Number(userId),
-        natureza,
+        natureza: natureza.trim(),
         fileUrl,
         referenciaMes,
         dataEmissao,

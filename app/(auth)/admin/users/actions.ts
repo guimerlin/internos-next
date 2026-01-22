@@ -16,10 +16,10 @@ export async function createUserAction(formData: FormData) {
     const imageUrl = await uploadImage(image);
     bodyData.image = imageUrl;
   }
-  bodyData.username = username;
-  bodyData.password = password;
-  bodyData.fullName = fullName;
-  bodyData.role = role;
+  bodyData.username = username.trim();
+  bodyData.password = password.trim();
+  bodyData.fullName = fullName.trim();
+  bodyData.role = role.trim();
 
   try {
     const response = await api('/admin/users', {
@@ -38,20 +38,19 @@ export async function createUserAction(formData: FormData) {
 
 export async function updateUserAction(formData: FormData) {
   const userId = formData.get('userId');
-  const fullName = formData.get('fullName');
-  const role = formData.get('role');
+  const fullName = formData.get('fullName') as string;
+  const role = formData.get('role') as string;
   const profileImage = formData.get('profileImage') as File;
-  const username = formData.get('username');
+  const username = formData.get('username') as string;
 
   const imageUrl =
     profileImage.size === 0 ? await uploadImage(profileImage) : undefined;
 
   const updateData = {} as any;
-  if (fullName) updateData.fullName = fullName;
-  if (role) updateData.role = role;
+  if (fullName) updateData.fullName = fullName.trim();
+  if (role) updateData.role = role.trim();
   if (imageUrl) updateData.image = imageUrl;
-  if (username) updateData.username = username;
-  console.log(updateData);
+  if (username) updateData.username = username.trim();
 
   const response = await api(`/admin/users/${userId}`, {
     method: 'PUT',
@@ -64,12 +63,12 @@ export async function updateUserAction(formData: FormData) {
 }
 
 export async function resetPasswordAction(formData: FormData) {
-  const newPassword = formData.get('newPassword');
+  const newPassword = formData.get('newPassword') as string;
   const userId = formData.get('userId');
 
   const response = await api(`/admin/users/${userId}/reset-password`, {
     method: 'PATCH',
-    body: JSON.stringify({ newPassword }),
+    body: JSON.stringify({ newPassword: newPassword.trim() }),
   });
   if (!response.ok) throw new Error('Erro ao redefinir senha');
   console.log('REDEFINIR SENHA:', newPassword);

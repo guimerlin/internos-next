@@ -60,9 +60,9 @@ export async function signUp(formData: FormData) {
     const imageUrl = await uploadImage(image);
     bodyData.image = imageUrl;
   }
-  bodyData.username = username;
-  bodyData.password = password;
-  bodyData.fullName = fullName;
+  bodyData.username = username.trim();
+  bodyData.password = password.trim();
+  bodyData.fullName = fullName.trim();
 
   try {
     const response = await fetch(
@@ -96,7 +96,10 @@ export async function signIn(formData: FormData) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password.trim(),
+        }),
         cache: 'no-store',
       },
     );
